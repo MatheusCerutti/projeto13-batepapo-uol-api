@@ -147,7 +147,7 @@ server.get("/messages", async(req, res) =>{
             ]
         }).limit(limite2).toArray()
 
-        res.send(messagens.reverse())
+        res.status(200).send(messagens.reverse())
         
     } catch (error) {
         console.error(error)

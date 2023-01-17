@@ -28,7 +28,7 @@ try {
 
 
 
-server.listen(5001, () => {
+server.listen(5000, () => {
     console.log('Servidor funfou')
 })
 

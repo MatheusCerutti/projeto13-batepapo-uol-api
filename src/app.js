@@ -59,7 +59,7 @@ try {
             res.status(201).send("Deu certo")
 
         } catch (error) {
-            res.status(500).send("Erro no servidor")
+            res.status(500).send("Erro no bd")
         }
 
     })
@@ -100,17 +100,45 @@ server.post("/messages", async (req, res) => {
         return res.status(422).send(validacao)
     }
 
-    const validarusuario = await db.collection("participants").findOne({name:user})
+    try {
+        const validarusuario = await db.collection("participants").findOne({name:user})
 
-    if (!validarusuario){
-        return res.status(422).send()
+        if (!validarusuario){
+            return res.status(422).send()
+        }
+    
+        await db.collection("messages").insertOne({from:user,to,text,type,time:dayjs().format("HH:mm:ss")})
+    
+        res.status(201).send("Deu certo")
+        
+    } catch (error) {
+        res.status(500).send("Deu erro no bd")
     }
 
-    await db.collection("messages").insertOne({from:user,to,text,type,time:dayjs().format("HH:mm:ss")})
-
-    res.status(201).send("Deu certo")
+   
 })
 
+server.get("/messages", async(req, res) =>{
+    const {user} = req.headers
+    const limite = parseInt(req.query.limit)
+
+    try {
+
+        const messagens = await db.collection("messages").find({
+            $or: [
+                {from: user},
+                {to: {$in: [user,"Todos"]}},
+                {type:"message"}
+            ]
+        }).limit(limite).toArray()
+
+        res.send(messagens)
+        
+    } catch (error) {
+        console.error(error)
+        res.status(500).send("Erro no servidor")
+    }
+})
 
 
 

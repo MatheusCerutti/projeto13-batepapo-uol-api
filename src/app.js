@@ -120,7 +120,22 @@ server.post("/messages", async (req, res) => {
 
 server.get("/messages", async(req, res) =>{
     const {user} = req.headers
-    const limite = parseInt(req.query.limit)
+    const limite = req.query.limit
+    let limite2 = 0;
+
+    if(limite != null){
+        limite2 = Number(limite)
+
+        if(isNaN(limite2) || limite2 == 0){
+            return res.status(422).send("deu errado")
+        }
+    } else {
+        limite2 = Number(limite)
+    }
+
+
+
+    
 
     try {
 
@@ -130,9 +145,9 @@ server.get("/messages", async(req, res) =>{
                 {to: {$in: [user,"Todos"]}},
                 {type:"message"}
             ]
-        }).limit(limite).toArray()
+        }).limit(limite2).toArray()
 
-        res.send(messagens)
+        res.send(messagens.reverse())
         
     } catch (error) {
         console.error(error)
@@ -140,6 +155,25 @@ server.get("/messages", async(req, res) =>{
     }
 })
 
+server.post("/status", async(req,res) => {
+    const {user} = req.headers
+
+    try {
+
+        const validarusuario = await db.collection("participants").findOne({name:user})
+
+        if (!validarusuario){
+            return res.status(404).send()
+        }
+
+        await db.collection("participants").updateOne({name:user},{$set:{lastStatus: Date.now()}})
+
+        res.status(200).send()
+        
+    } catch (error) {
+        res.status(500).send("Deu erro no bd")
+    }
+})
 
 
 

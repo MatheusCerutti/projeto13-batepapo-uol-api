@@ -176,5 +176,36 @@ server.post("/status", async(req,res) => {
 })
 
 
+setInterval(async ()=>{
+    const dezsegundosatras = Date.now() - 10000
+
+    try {
+        
+    const participantesinativos = await db.collection("participants").find({
+        lastStatus: {$lte:dezsegundosatras}
+    }).toArray()
+
+    if(participantesinativos.length > 0){
+        const mensagemsaida = participantesinativos.map((mensagem)=>{
+            return {
+                from:mensagem.name,
+                to:"Todos",
+                text:"sai da sala...",
+                type:"status",
+                time: dayjs().format("HH:mm:ss")
+            }
+        })
+
+        await db.collection("messages").insertMany(mensagemsaida)
+        await db.collection("participants").deleteMany({lastStatus: {$lte:dezsegundosatras}})
+    }
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).send("Deu ero no bd")
+    }
+},15000)
+
+
 
 

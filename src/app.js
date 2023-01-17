@@ -126,7 +126,7 @@ server.get("/messages", async(req, res) =>{
     if(limite != null){
         limite2 = Number(limite)
 
-        if(isNaN(limite2) || limite2 == 0){
+        if(isNaN(limite2) || limite2 <= 0){
             return res.status(422).send("deu errado")
         }
     } else {

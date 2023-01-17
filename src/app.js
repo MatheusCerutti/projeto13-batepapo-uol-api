@@ -55,7 +55,7 @@ try {
             }
 
             await db.collection("participants").insertOne({ name, lastStatus: Date.now() })
-            await db.collection("messages").insertOne({ from: { name }, to: "Todos", text: "entra na sala...", type: "status", time: dayjs(Date.now()).format("HH:mm:ss") })
+            await db.collection("messages").insertOne({ from: name , to: "Todos", text: "entra na sala...", type: "status", time: dayjs(Date.now()).format("HH:mm:ss") })
             res.status(201).send("Deu certo")
 
         } catch (error) {
